@@ -15,6 +15,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JPanel;
 
 /**
@@ -90,15 +92,15 @@ public class GamePanel extends JPanel implements Runnable {
 
     @Override
     public void run() {
-        while (running) {
+        while (running && game.controls.vidas > 0) {
             tick();
             repaint();
         }
+        repaint();
     }
 
     public void tick() {
         game.tick(input.key);
-        
     }
 
     @Override
@@ -108,19 +110,40 @@ public class GamePanel extends JPanel implements Runnable {
         Graphics2D g2 = (Graphics2D) g;
         Font font = new Font("Arial", 1, 20);
         g.setFont(font);
-        
+
         Color playerColor = new Color(0xFFaFFa);
         Color blockColor = new Color(0xFF44a0);
-        g2.setColor(blockColor);
+
         List<Rectangle> retangulos = blocks.tick();
         for (int i = 0; i < retangulos.size(); i++) {
+            g2.setColor(blockColor);
             g2.fill(retangulos.get(i));
+            g2.setColor(playerColor);
+            if (game.controls.correto) {
+                g2.setColor(Color.green);
+            } else if (!game.controls.correto && game.controls.blockY == game.controls.playerY) {
+                g2.setColor(Color.red);
+            }
+            g2.fill(player.tick());
+            g2.setColor(Color.white);
+            g2.drawString(game.controls.respostas[i], i * game.controls.tileSize * 4 + game.controls.tileSize * 2 - font.getSize(), game.controls.blockY + game.controls.tileSize / 2 + 5);
         }
-        g2.setColor(playerColor);
-        g2.fill(player.tick());
-        g.setColor(Color.white);
-        g.drawString("Score: "+Integer.toString(game.controls.score), screenWidth/2 - tileSize - font.getSize(), game.controls.playerY + 80);
 
+        g.setColor(Color.white);
+        g.drawString("Score: " + Integer.toString(game.controls.score), screenWidth / 2 - tileSize - font.getSize(), game.controls.playerY + 80);
+        g.drawString(game.controls.gameDifficulty.toUpperCase(), 20, game.controls.playerY + 80);
+        g.drawString(game.controls.question, screenWidth / 2 - tileSize - font.getSize(), 20);
+        g.drawString("Vidas: "+Integer.toString(game.controls.vidas), screenWidth - tileSize * 2, game.controls.playerY + 80);
+        
+        if(game.controls.vidas <= 0) {
+            System.out.println("entrou");
+            g.setColor(blockColor);
+            g.fillRect(0, 0, screenWidth, screenHeight);
+            Font gameover = new Font("Arial", 3, 50);          
+            g.setFont(gameover);
+            g.setColor(Color.white);
+            g.drawString("Game Over", (screenWidth / 2) - 150, screenHeight/2);
+        }
         g2.dispose();
     }
 }
