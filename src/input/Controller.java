@@ -21,35 +21,52 @@ interface BinaryOperator {
 public class Controller {
 
     public static final int tileSize = GamePanel.tileSize, playerHeight = tileSize, playerY = tileSize * 10;
-    public static int xMove = 7, score = 0, playerX = xMove * tileSize, blockY, oldTime = 0, blockSpeed = 10000000, operacao = 0, maxBound = 1;
-    public static boolean blockMove = false, moving = true;
-    public static boolean[] resposta;
+    public static int xMove = 7, score = 0, playerX = xMove * tileSize, blockY, oldTime = 0, blockSpeed = 20000000, operacao = 0, maxBound = 4, iResposta;
+    public static boolean blockMove = false, moving = true, next = true, correto = false;
+    public static int vidas = 5;
+    public static String[] respostas = new String[4];
     public static double pastTime = System.currentTimeMillis();
     public static Random random = new Random();
-    public static double valor1 = random.nextDouble() * ((maxBound * 2) - maxBound), valor2 = random.nextDouble() * ((maxBound * 2) - maxBound);
-    
+    public static String gameDifficulty, question = "", operator;
+    public static int valor1 = random.nextInt((maxBound * 2)) - maxBound, valor2 = random.nextInt((maxBound * 2)) - maxBound;
+
     static BinaryOperator operador = getRandomOperator();
-    static double resultado = operador.apply(valor1, valor2);
-    static String operator;
+    public static double resultado = operador.apply(valor1, valor2);
 
     public void tick(boolean left, boolean right) {
         int oldX = xMove;
+        switch (operacao) {
+            case 0:
+                operator = "+";
+                break;
+            case 1:
+                operator = "-";
+                break;
+            case 2:
+                operator = "*";
+                break;
+            case 3:
+                operator = "/";
+                break;
+        }
         if (Game.time % blockSpeed == 0 && moving) {
             blockY += tileSize;
             oldTime = Game.time;
             pastTime = System.currentTimeMillis();
             if (blockY > (tileSize * 12)) {
                 blockY = 0;
-            }        
+            }
         }
         if (!moving) {
             for (int i = 0; i < 50; i++) {
                 double currentTime = System.currentTimeMillis();
                 int cooldown = (int) (5 - (currentTime - pastTime) / 1000);
-                score = cooldown;
+
                 if (cooldown <= 0) {
                     moving = true;
                     blockMove = false;
+                    next = true;
+                    correto = false;
                     blockY = 0;
                     valor1 = random.nextInt((maxBound * 2)) - maxBound;
                     valor2 = random.nextInt((maxBound * 2)) - maxBound;
@@ -69,7 +86,7 @@ public class Controller {
                             operator = "/";
                             break;
                     }
-                    System.out.println(resultado + ": " + valor1+operator+valor2);
+                    
                 }
             }
         }
