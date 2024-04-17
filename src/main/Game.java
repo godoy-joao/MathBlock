@@ -13,10 +13,10 @@ import java.awt.event.KeyEvent;
  * @author Senai
  */
 public class Game {
-    public static int time;
+
+    public static int time, vidas = 5;
+    
     public Controller controls;
-    
-    
 
     public Game() {
         controls = new Controller();
@@ -25,9 +25,14 @@ public class Game {
     public void tick(boolean[] key) {
         time++;
         
+        if(time >= Integer.MAX_VALUE) {
+            time = 0;
+        }
         boolean left = key[KeyEvent.VK_A] || key[KeyEvent.VK_LEFT];
         boolean right = key[KeyEvent.VK_D] || key[KeyEvent.VK_RIGHT];
-        
+
         controls.tick(left, right);
     }
+    
+    
 }
