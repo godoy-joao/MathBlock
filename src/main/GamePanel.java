@@ -103,6 +103,7 @@ public class GamePanel extends JPanel implements Runnable {
         game.tick(input.key);
     }
 
+    
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -134,7 +135,7 @@ public class GamePanel extends JPanel implements Runnable {
         g.drawString(game.controls.gameDifficulty.toUpperCase(), 20, game.controls.playerY + 80);
         g.drawString(game.controls.question, screenWidth / 2 - tileSize - font.getSize(), 20);
         g.drawString("Vidas: "+Integer.toString(game.controls.vidas), screenWidth - tileSize * 2, game.controls.playerY + 80);
-        
+        g.drawString(Integer.toString(game.controls.cooldown), 0, 0);
         if(game.controls.vidas <= 0) {
             System.out.println("entrou");
             g.setColor(blockColor);
@@ -143,6 +144,9 @@ public class GamePanel extends JPanel implements Runnable {
             g.setFont(gameover);
             g.setColor(Color.white);
             g.drawString("Game Over", (screenWidth / 2) - 150, screenHeight/2);
+            Font score = new Font("Arial", 2, 20);
+            g.setFont(score);
+            g.drawString("Pontuação final: "+game.controls.score, (screenWidth / 2) - 110, screenHeight/2 + 30);
         }
         g2.dispose();
     }

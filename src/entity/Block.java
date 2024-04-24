@@ -20,8 +20,9 @@ public class Block {
     Game game = new Game();
 
     public List<Rectangle> tick() {
-        game.controls.question = "(" + game.controls.valor1 + ")" + " " + game.controls.operator + " " + "(" + game.controls.valor2 + ")";
+        game.controls.question = "(" + String.format("%.1f", game.controls.valor1) + ")" + " " + game.controls.operator + " " + "(" + String.format("%.1f", game.controls.valor2) + ")";
         List<Rectangle> rects = new ArrayList();
+
         game.controls.gameDifficulty = "easy";
         if (game.controls.score >= 2000 && game.controls.score < 5000) {
             game.controls.gameDifficulty = "medium";
@@ -31,11 +32,11 @@ public class Block {
         switch (game.controls.gameDifficulty) {
             case "easy":
                 game.controls.blockSpeed = 20000000;
-                game.controls.maxBound = 5;
+                game.controls.maxBound = 20;
                 break;
             case "medium":
                 game.controls.blockSpeed = 13000000;
-                game.controls.maxBound = 10;
+                game.controls.maxBound = 50;
                 break;
             case "hard":
                 game.controls.blockSpeed = 7000000;
@@ -45,18 +46,25 @@ public class Block {
         Random random = new Random();
         if (game.controls.next) {
             for (int i = 0; i < 4; i++) {
-                game.controls.respostas[i] = String.format("%.2f", (random.nextDouble() * game.controls.maxBound * 6 + 1));
-                System.out.println(game.controls.respostas[i]);
+                double options;
+                if (game.controls.gameDifficulty.equals("easy") || game.controls.gameDifficulty.equals("medium")) {
+                    options = random.nextInt(game.controls.maxBound * 4) - game.controls.maxBound * 2;
+                } else {
+                    options = random.nextDouble() * game.controls.maxBound * 6 + 1;
+                }
+                game.controls.respostas[i] = String.format("%.1f", options);
+                
             }
             boolean temResposta = false;
             for (int i = 0; i < game.controls.respostas.length; i++) {
                 if (Double.parseDouble(game.controls.respostas[i].replace(",", ".")) == game.controls.resultado) {
                     temResposta = true;
+                    System.out.println(game.controls.resultado);
                 }
             }
             if (!temResposta) {
                 game.controls.iResposta = random.nextInt(4);
-                game.controls.respostas[game.controls.iResposta] = String.format("%.2f", game.controls.resultado);
+                game.controls.respostas[game.controls.iResposta] = String.format("%.1f", game.controls.resultado);
             }
             game.controls.next = false;
         }
@@ -70,13 +78,13 @@ public class Block {
                 game.controls.moving = false;
                 game.controls.blockMove = true;
                 game.controls.pastTime = System.currentTimeMillis();
-                System.out.println(game.controls.iResposta * game.controls.tileSize * 4 + game.controls.tileSize);
                 int xResposta = game.controls.iResposta * game.controls.tileSize * 4 + game.controls.tileSize;
                 if (game.controls.playerX >= xResposta && game.controls.playerX < xResposta + game.controls.tileSize * 2) {
                     game.controls.score += 200;
                     game.controls.correto = true;
                 } else {
                     game.controls.vidas -= 1;
+                    game.controls.score -= 100;
                 }
             }
             rects.add(rect);

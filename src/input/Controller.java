@@ -21,19 +21,19 @@ interface BinaryOperator {
 public class Controller {
 
     public static final int tileSize = GamePanel.tileSize, playerHeight = tileSize, playerY = tileSize * 10;
-    public static int xMove = 7, score = 0, playerX = xMove * tileSize, blockY, oldTime = 0, blockSpeed = 20000000, operacao = 0, maxBound = 4, iResposta;
+    public static int xMove = 7, score = 0, playerX = xMove * tileSize, blockY, oldTime = 0, blockSpeed = 20000000, operacao = 0, maxBound = 20, iResposta, cooldown;
     public static boolean blockMove = false, moving = true, next = true, correto = false;
     public static int vidas = 5;
     public static String[] respostas = new String[4];
     public static double pastTime = System.currentTimeMillis();
     public static Random random = new Random();
     public static String gameDifficulty, question = "", operator;
-    public static int valor1 = random.nextInt((maxBound * 2)) - maxBound, valor2 = random.nextInt((maxBound * 2)) - maxBound;
+    public static double valor1 = random.nextInt(maxBound * 2) - maxBound, valor2 = random.nextInt(maxBound * 2) - maxBound;
 
     static BinaryOperator operador = getRandomOperator();
     public static double resultado = operador.apply(valor1, valor2);
 
-    public void tick(boolean left, boolean right) {
+    public void tick(boolean left, boolean right, boolean down, boolean up) {
         int oldX = xMove;
         switch (operacao) {
             case 0:
@@ -60,16 +60,23 @@ public class Controller {
         if (!moving) {
             for (int i = 0; i < 50; i++) {
                 double currentTime = System.currentTimeMillis();
-                int cooldown = (int) (5 - (currentTime - pastTime) / 1000);
-
+                cooldown = (int) (5 - (currentTime - pastTime) / 1000);
+                if (up) {
+                    cooldown = 0;
+                }
                 if (cooldown <= 0) {
                     moving = true;
                     blockMove = false;
                     next = true;
                     correto = false;
                     blockY = 0;
-                    valor1 = random.nextInt((maxBound * 2)) - maxBound;
-                    valor2 = random.nextInt((maxBound * 2)) - maxBound;
+                    if (gameDifficulty.equals("easy") || gameDifficulty.equals("medium")) {
+                        valor1 = random.nextInt(maxBound * 2) - maxBound;
+                        valor2 = random.nextInt(maxBound * 2) - maxBound;
+                    } else {
+                        valor2 = random.nextDouble() * (maxBound * 2) - maxBound;
+                        valor1 = random.nextDouble() * (maxBound * 2) - maxBound;
+                    }
                     operador = getRandomOperator();
                     resultado = operador.apply(valor1, valor2);
                     switch (operacao) {
@@ -86,7 +93,7 @@ public class Controller {
                             operator = "/";
                             break;
                     }
-                    
+
                 }
             }
         }
@@ -97,7 +104,7 @@ public class Controller {
         if (right && !blockMove && moving) {
             xMove += 1;
             blockMove = true;
-            System.out.println(xMove);
+            
         }
         if (!left && !right) {
             blockMove = false;
@@ -105,6 +112,10 @@ public class Controller {
         if (xMove != oldX) {
             playerX = xMove * tileSize;
         }
+        if (down) {
+            blockSpeed = 400000;
+        }
+
         if (playerX < 0) {
             playerX = 0;
             xMove = 0;

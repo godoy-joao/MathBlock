@@ -15,7 +15,7 @@ import java.awt.event.KeyEvent;
 public class Game {
 
     public static int time, vidas = 5;
-    
+
     public Controller controls;
 
     public Game() {
@@ -24,15 +24,16 @@ public class Game {
 
     public void tick(boolean[] key) {
         time++;
-        
-        if(time >= Integer.MAX_VALUE) {
+
+        if (time >= Integer.MAX_VALUE) {
             time = 0;
         }
         boolean left = key[KeyEvent.VK_A] || key[KeyEvent.VK_LEFT];
         boolean right = key[KeyEvent.VK_D] || key[KeyEvent.VK_RIGHT];
+        boolean down = key[KeyEvent.VK_S] || key[KeyEvent.VK_DOWN];
+        boolean up = key[KeyEvent.VK_W] || key[KeyEvent.VK_UP];
 
-        controls.tick(left, right);
+        controls.tick(left, right, down, up);
     }
-    
-    
+
 }
